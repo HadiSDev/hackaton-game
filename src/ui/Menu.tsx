@@ -1,8 +1,20 @@
-import { useGameStore } from '../store';
+import { useGameStore, DIFFICULTY_PRESETS, type DifficultyPreset } from '../store';
+
+const presetOrder: DifficultyPreset[] = ['easy', 'normal', 'hard', 'insane'];
+
+const presetColors: Record<DifficultyPreset, string> = {
+  easy: '#4ecdc4',
+  normal: '#f7c948',
+  hard: '#ff6b35',
+  insane: '#ff2244',
+};
 
 export default function Menu() {
   const start = useGameStore((s) => s.start);
   const highScore = useGameStore((s) => s.highScore);
+  const difficultyPreset = useGameStore((s) => s.difficultyPreset);
+  const setDifficultyPreset = useGameStore((s) => s.setDifficultyPreset);
+  const config = DIFFICULTY_PRESETS[difficultyPreset];
 
   return (
     <div
@@ -30,9 +42,59 @@ export default function Menu() {
       >
         SKY HOPPER
       </h1>
-      <p style={{ fontSize: '18px', color: 'rgba(255,255,255,0.6)', margin: '10px 0 40px' }}>
+      <p style={{ fontSize: '18px', color: 'rgba(255,255,255,0.6)', margin: '10px 0 30px' }}>
         Jump across the sky. Don't fall.
       </p>
+
+      {/* Difficulty selector */}
+      <div style={{ marginBottom: '30px', textAlign: 'center' }}>
+        <div style={{ fontSize: '14px', color: 'rgba(255,255,255,0.5)', marginBottom: '12px', textTransform: 'uppercase', letterSpacing: '2px' }}>
+          Difficulty
+        </div>
+        <div style={{ display: 'flex', gap: '8px' }}>
+          {presetOrder.map((preset) => {
+            const p = DIFFICULTY_PRESETS[preset];
+            const isActive = preset === difficultyPreset;
+            const color = presetColors[preset];
+            return (
+              <button
+                key={preset}
+                onClick={() => setDifficultyPreset(preset)}
+                style={{
+                  padding: '10px 18px',
+                  fontSize: '14px',
+                  fontFamily: 'monospace',
+                  fontWeight: 'bold',
+                  border: `2px solid ${isActive ? color : 'rgba(255,255,255,0.15)'}`,
+                  borderRadius: '6px',
+                  background: isActive ? `${color}22` : 'transparent',
+                  color: isActive ? color : 'rgba(255,255,255,0.4)',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s',
+                }}
+                onMouseEnter={(e) => {
+                  if (!isActive) {
+                    e.currentTarget.style.borderColor = 'rgba(255,255,255,0.3)';
+                    e.currentTarget.style.color = 'rgba(255,255,255,0.7)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!isActive) {
+                    e.currentTarget.style.borderColor = 'rgba(255,255,255,0.15)';
+                    e.currentTarget.style.color = 'rgba(255,255,255,0.4)';
+                  }
+                }}
+              >
+                {p.label}
+              </button>
+            );
+          })}
+        </div>
+        <div style={{ fontSize: '13px', color: 'rgba(255,255,255,0.4)', marginTop: '8px' }}>
+          {config.description}
+        </div>
+      </div>
+
       <button
         onClick={start}
         style={{

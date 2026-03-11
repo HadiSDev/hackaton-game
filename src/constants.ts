@@ -43,7 +43,7 @@ export const MAX_LIVES = 3;
 export const RESPAWN_INVINCIBILITY = 1.5;
 
 // Towers
-export const TOWER_DIFFICULTY_THRESHOLD = 0.15;
+export const TOWER_DIFFICULTY_THRESHOLD = 0.05;
 export const TOWER_SPAWN_CHANCE = 0.2;
 export const TOWER_HEIGHT = 2.0;
 export const TOWER_RADIUS = 0.3;
