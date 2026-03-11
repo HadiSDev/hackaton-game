@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(bun --version)",
+      "Bash(bun create:*)",
+      "Read(//tmp/**)",
+      "Bash(bun install:*)",
+      "Bash(bun add:*)",
+      "Bash(bun run:*)",
+      "WebFetch(domain:drei.docs.pmnd.rs)"
+    ]
+  }
+}
