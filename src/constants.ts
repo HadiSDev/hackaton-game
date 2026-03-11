@@ -25,8 +25,8 @@ export const PLATFORM_DEPTH_MAX = 5;
 export const PLATFORM_HEIGHT = 0.4;
 
 // Gap distances (lerps with difficulty)
-export const GAP_DISTANCE_MIN = 2;
-export const GAP_DISTANCE_MAX = 5.5;
+export const GAP_DISTANCE_MIN = 4;
+export const GAP_DISTANCE_MAX = 6;
 export const HEIGHT_DELTA_MIN = -0.3;
 export const HEIGHT_DELTA_MAX = 1.8;
 export const LATERAL_OFFSET_MAX = 2;
@@ -41,3 +41,18 @@ export const CRUMBLE_DELAY = 1.0;
 // Lives
 export const MAX_LIVES = 3;
 export const RESPAWN_INVINCIBILITY = 1.5;
+
+// Towers
+export const TOWER_DIFFICULTY_THRESHOLD = 0.15;
+export const TOWER_SPAWN_CHANCE = 0.2;
+export const TOWER_HEIGHT = 2.0;
+export const TOWER_RADIUS = 0.3;
+export const TOWER_LATERAL_OFFSET = 3.0;
+export const TOWER_FIRE_RATE_MIN = 2.5;
+export const TOWER_FIRE_RATE_MAX = 1.5;
+
+// Projectiles
+export const PROJECTILE_SPEED = 6;
+export const PROJECTILE_RADIUS = 0.2;
+export const PROJECTILE_LIFETIME = 4.0;
+export const PROJECTILE_MAX_ACTIVE = 3;

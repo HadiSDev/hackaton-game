@@ -1,10 +1,11 @@
 import * as THREE from 'three';
-import type { PlatformData, PlatformType } from '../types';
+import type { PlatformData, PlatformType, TowerData } from '../types';
 import {
   PLATFORM_WIDTH_MIN,
   PLATFORM_WIDTH_MAX,
   PLATFORM_DEPTH_MIN,
   PLATFORM_DEPTH_MAX,
+  PLATFORM_HEIGHT,
   GAP_DISTANCE_MIN,
   GAP_DISTANCE_MAX,
   HEIGHT_DELTA_MIN,
@@ -18,6 +19,13 @@ import {
   JUMP_FORCE,
   GRAVITY_SCALE,
   PLAYER_FORWARD_SPEED,
+  TOWER_DIFFICULTY_THRESHOLD,
+  TOWER_SPAWN_CHANCE,
+  TOWER_HEIGHT,
+  TOWER_LATERAL_OFFSET,
+  TOWER_FIRE_RATE_MIN,
+  TOWER_FIRE_RATE_MAX,
+  PROJECTILE_SPEED,
 } from '../constants';
 
 function lerp(a: number, b: number, t: number) {
@@ -53,9 +61,11 @@ function choosePlatformType(difficulty: number): PlatformType {
 }
 
 let nextId = 0;
+let nextTowerId = 0;
 
 export function resetPlatformGenerator() {
   nextId = 0;
+  nextTowerId = 0;
 }
 
 export function generateStartPlatform(): PlatformData[] {
@@ -87,8 +97,10 @@ const GRAVITY = 9.81 * GRAVITY_SCALE;
 const MAX_JUMP_HEIGHT = (JUMP_FORCE * JUMP_FORCE) / (2 * GRAVITY); // ~2.17
 const JUMP_HANG_TIME = (2 * JUMP_FORCE) / GRAVITY; // total airtime ~1.09s
 const MAX_JUMP_FORWARD = PLAYER_FORWARD_SPEED * JUMP_HANG_TIME; // ~6.5
-// Minimum visible edge-to-edge gap: ball diameter + comfortable padding
-const MIN_EDGE_GAP = PLAYER_RADIUS * 2 + 1.5;
+// Minimum edge-to-edge gap: must be wide enough that the ball falls through without jumping
+// At speed 6, ball needs ~0.25s to fall past platform edge (PLAYER_RADIUS).
+// Distance in 0.25s = 1.5 units. Add generous margin so it's clearly a jump.
+const MIN_EDGE_GAP = 3.5;
 
 export function generateNextPlatform(
   lastPosition: THREE.Vector3,
@@ -111,12 +123,12 @@ export function generateNextPlatform(
   // Gap — tiny early, grows with difficulty
   let gapDistance: number;
   if (isIntro) {
-    // Close but with visible gaps — easy hops with clear separation
-    gapDistance = randomRange(3.5, 4.5);
+    // Clear gaps that require jumping — easy hops but you must press space
+    gapDistance = randomRange(5, 6);
   } else {
     gapDistance = lerp(GAP_DISTANCE_MIN, GAP_DISTANCE_MAX, difficulty) + randomRange(-0.3, 0.3);
     // Blend from easy gaps in the transition zone
-    gapDistance = lerp(4, gapDistance, introFade);
+    gapDistance = lerp(5.5, gapDistance, introFade);
   }
   // gapDistance is center-to-center; enforce minimum EDGE-to-EDGE gap
   // edge gap = gapDistance - lastDepth/2 - depth/2
@@ -185,4 +197,29 @@ export function generateNextPlatform(
   }
 
   return platform;
+}
+
+export function generateTower(
+  platform: PlatformData,
+  difficulty: number,
+): TowerData | null {
+  if (difficulty < TOWER_DIFFICULTY_THRESHOLD) return null;
+  if (Math.random() > TOWER_SPAWN_CHANCE) return null;
+  // Don't place towers on crumbling platforms
+  if (platform.type === 'crumbling') return null;
+
+  const side = Math.random() > 0.5 ? 1 : -1;
+  const position = new THREE.Vector3(
+    platform.position.x + side * TOWER_LATERAL_OFFSET,
+    platform.position.y + PLATFORM_HEIGHT / 2 + TOWER_HEIGHT / 2,
+    platform.position.z,
+  );
+
+  return {
+    id: nextTowerId++,
+    position,
+    platformId: platform.id,
+    fireRate: lerp(TOWER_FIRE_RATE_MIN, TOWER_FIRE_RATE_MAX, difficulty),
+    projectileSpeed: lerp(PROJECTILE_SPEED * 0.7, PROJECTILE_SPEED, difficulty),
+  };
 }

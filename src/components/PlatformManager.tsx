@@ -3,11 +3,13 @@ import { useFrame } from '@react-three/fiber';
 import { type RapierRigidBody } from '@react-three/rapier';
 import * as THREE from 'three';
 import Platform from './Platform';
-import type { PlatformData } from '../types';
+import Tower from './Tower';
+import type { PlatformData, TowerData } from '../types';
 import { useGameStore } from '../store';
 import {
   generateStartPlatform,
   generateNextPlatform,
+  generateTower,
   resetPlatformGenerator,
 } from '../hooks/usePlatformGenerator';
 import {
@@ -22,6 +24,7 @@ interface PlatformManagerProps {
 
 export default function PlatformManager({ playerRef }: PlatformManagerProps) {
   const [platforms, setPlatforms] = useState<PlatformData[]>([]);
+  const [towers, setTowers] = useState<TowerData[]>([]);
   const lastPlatformPos = useRef(new THREE.Vector3(0, 0, 0));
   const lastPlatformDepth = useRef(5);
   const getDifficulty = useGameStore((s) => s.getDifficulty);
@@ -48,6 +51,7 @@ export default function PlatformManager({ playerRef }: PlatformManagerProps) {
       }
 
       setPlatforms(initial);
+      setTowers([]);
       initialized.current = true;
     }
 
@@ -63,6 +67,8 @@ export default function PlatformManager({ playerRef }: PlatformManagerProps) {
     const difficulty = getDifficulty();
     let changed = false;
     let newPlatforms = [...platforms];
+    let newTowers = [...towers];
+    let towersChanged = false;
 
     // Spawn ahead
     while (lastPlatformPos.current.z < playerZ + SPAWN_DISTANCE) {
@@ -71,6 +77,13 @@ export default function PlatformManager({ playerRef }: PlatformManagerProps) {
       lastPlatformPos.current.copy(platform.position);
       lastPlatformDepth.current = platform.depth;
       changed = true;
+
+      // Try to spawn a tower alongside this platform
+      const tower = generateTower(platform, difficulty);
+      if (tower) {
+        newTowers.push(tower);
+        towersChanged = true;
+      }
     }
 
     // Despawn behind
@@ -80,8 +93,17 @@ export default function PlatformManager({ playerRef }: PlatformManagerProps) {
     );
     if (newPlatforms.length !== beforeCount) changed = true;
 
+    const beforeTowerCount = newTowers.length;
+    newTowers = newTowers.filter(
+      (t) => t.position.z > playerZ - DESPAWN_DISTANCE,
+    );
+    if (newTowers.length !== beforeTowerCount) towersChanged = true;
+
     if (changed) {
       setPlatforms(newPlatforms);
+    }
+    if (towersChanged) {
+      setTowers(newTowers);
     }
   });
 
@@ -89,6 +111,9 @@ export default function PlatformManager({ playerRef }: PlatformManagerProps) {
     <>
       {platforms.map((p) => (
         <Platform key={p.id} data={p} />
+      ))}
+      {towers.map((t) => (
+        <Tower key={t.id} data={t} playerRef={playerRef} />
       ))}
     </>
   );

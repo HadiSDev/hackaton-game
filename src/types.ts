@@ -16,3 +16,11 @@ export interface PlatformData {
   // Color
   color: string;
 }
+
+export interface TowerData {
+  id: number;
+  position: THREE.Vector3;
+  platformId: number;
+  fireRate: number;
+  projectileSpeed: number;
+}

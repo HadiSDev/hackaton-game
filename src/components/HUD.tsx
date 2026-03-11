@@ -1,5 +1,7 @@
 import { useGameStore } from '../store';
 
+const PIXEL_FONT = "'Press Start 2P', monospace";
+
 export default function HUD() {
   const score = useGameStore((s) => s.score);
   const highScore = useGameStore((s) => s.highScore);
@@ -19,7 +21,7 @@ export default function HUD() {
         height: '100%',
         pointerEvents: 'none',
         zIndex: 10,
-        fontFamily: 'monospace',
+        fontFamily: PIXEL_FONT,
       }}
     >
       {/* Top bar */}
@@ -28,17 +30,19 @@ export default function HUD() {
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'flex-start',
-          padding: '16px 24px',
+          padding: '20px 28px',
         }}
       >
         {/* Hearts — top left */}
-        <div style={{ display: 'flex', gap: '6px', fontSize: '28px' }}>
+        <div style={{ display: 'flex', gap: '10px', fontSize: '36px' }}>
           {Array.from({ length: maxLives }, (_, i) => (
             <span
               key={i}
               style={{
-                color: i < lives ? '#ff6b35' : 'rgba(255,255,255,0.2)',
-                textShadow: i < lives ? '0 0 8px rgba(255,107,53,0.6)' : 'none',
+                color: i < lives ? '#ff6b35' : 'rgba(255,255,255,0.15)',
+                textShadow: i < lives
+                  ? '0 0 12px rgba(255,107,53,0.7), 0 0 24px rgba(255,107,53,0.3)'
+                  : 'none',
                 transition: 'color 0.3s, text-shadow 0.3s',
               }}
             >
@@ -50,15 +54,15 @@ export default function HUD() {
         {/* High score — top right */}
         <div
           style={{
-            fontSize: '18px',
+            fontSize: '20px',
             color: '#f7c948',
-            textShadow: '0 1px 6px rgba(247,201,72,0.4)',
+            textShadow: '0 0 8px rgba(247,201,72,0.5), 0 2px 4px rgba(0,0,0,0.3)',
             display: 'flex',
             alignItems: 'center',
-            gap: '6px',
+            gap: '10px',
           }}
         >
-          <span style={{ fontSize: '20px' }}>{'\u{1F3C6}'}</span>
+          <span style={{ fontSize: '14px' }}>HI</span>
           {highScore}
         </div>
       </div>
@@ -74,10 +78,9 @@ export default function HUD() {
       >
         <div
           style={{
-            fontSize: '56px',
-            fontWeight: 'bold',
+            fontSize: '48px',
             color: 'white',
-            textShadow: '0 2px 12px rgba(0,0,0,0.5)',
+            textShadow: '0 2px 12px rgba(0,0,0,0.5), 0 0 20px rgba(255,255,255,0.1)',
             lineHeight: 1,
           }}
         >
@@ -85,11 +88,11 @@ export default function HUD() {
         </div>
         <div
           style={{
-            fontSize: '14px',
+            fontSize: '10px',
             color: '#ff6b35',
-            textShadow: '0 0 10px rgba(255,107,53,0.3)',
-            marginTop: '6px',
-            letterSpacing: '2px',
+            textShadow: '0 0 10px rgba(255,107,53,0.4)',
+            marginTop: '10px',
+            letterSpacing: '3px',
             textTransform: 'uppercase',
           }}
         >
@@ -106,8 +109,8 @@ export default function HUD() {
             left: 0,
             width: '100%',
             textAlign: 'center',
-            fontSize: '14px',
-            color: 'rgba(255,255,255,0.5)',
+            fontSize: '10px',
+            color: 'rgba(255,255,255,0.45)',
             letterSpacing: '1px',
           }}
         >
